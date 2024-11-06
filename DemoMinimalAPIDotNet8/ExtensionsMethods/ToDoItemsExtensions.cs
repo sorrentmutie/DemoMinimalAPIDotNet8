@@ -1,16 +1,22 @@
 ﻿using DemoAPI.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace DemoMinimalAPIDotNet8.ExtensionsMethods;
 
 public static class ToDoItemsExtensions
 {
+
     public static void RegisterEndpoints(this WebApplication app)
     {
+        
+    
         var toDoGroup = app.MapGroup("/todoitems");
 
-        toDoGroup.MapGet("/", async (ToDoDb db) => await db.ToDos.ToListAsync())
-        .WithOpenApi();
+        toDoGroup.MapGet("/", GetTodos);
+        //.Produces<List<ToDo>>(StatusCodes.Status200OK)
+        //.Produces(StatusCodes.Status404NotFound)
+
 
         toDoGroup.MapGet("/completed", async (ToDoDb db) =>
               await db.ToDos.Where(t => t.IsComplete).ToListAsync())
@@ -69,4 +75,10 @@ public static class ToDoItemsExtensions
 
 
     }
+
+    public static async Task<Results<Ok<List<ToDo>>, NotFound>>
+        GetTodos(ToDoDb db) =>
+            await db.ToDos.ToListAsync() is List<ToDo> todos
+               ? TypedResults.Ok(todos)
+               : TypedResults.NotFound();
 }
