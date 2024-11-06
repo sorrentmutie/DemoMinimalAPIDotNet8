@@ -76,9 +76,9 @@ public static class ToDoItemsExtensions
 
     }
 
-    public static async Task<Results<Ok<List<ToDo>>, NotFound>>
-        GetTodos(ToDoDb db) =>
-            await db.ToDos.ToListAsync() is List<ToDo> todos
-               ? TypedResults.Ok(todos)
-               : TypedResults.NotFound();
+    static async Task<Results<Ok<List<ToDo>>, NotFound>>
+       GetTodos(ToDoDb db) => await db.ToDos.ToListAsync()
+               is List<ToDo> todos
+                   ? TypedResults.Ok(todos)
+                   : TypedResults.NotFound();
 }
