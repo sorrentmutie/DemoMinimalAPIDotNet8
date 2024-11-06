@@ -13,7 +13,14 @@ public static class ToDoItemsExtensions
     
         var toDoGroup = app.MapGroup("/todoitems");
 
-        toDoGroup.MapGet("/", GetTodos);
+        toDoGroup.MapGet("/",
+            async Task<Results<Ok<List<ToDo>>, NotFound>>
+            (ToDoDb db) => await db.ToDos.ToListAsync()
+                    is List<ToDo> todos
+                        ? TypedResults.Ok(todos)
+                        : TypedResults.NotFound()
+
+            );
         //.Produces<List<ToDo>>(StatusCodes.Status200OK)
         //.Produces(StatusCodes.Status404NotFound)
 
@@ -77,7 +84,7 @@ public static class ToDoItemsExtensions
     }
 
     static async Task<Results<Ok<List<ToDo>>, NotFound>>
-       GetTodos(ToDoDb db) => await db.ToDos.ToListAsync()
+       GetAllTodos(ToDoDb db) => await db.ToDos.ToListAsync()
                is List<ToDo> todos
                    ? TypedResults.Ok(todos)
                    : TypedResults.NotFound();
