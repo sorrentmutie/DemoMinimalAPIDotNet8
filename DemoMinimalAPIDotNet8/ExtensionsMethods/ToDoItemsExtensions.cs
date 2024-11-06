@@ -6,10 +6,17 @@ namespace DemoMinimalAPIDotNet8;
 
 public static class ToDoItemsExtensions
 {
-    static async Task<Results<Ok<ToDo>, NotFound>> GetToDoById(int id, ToDoDb db) =>
-          await db.ToDos.FindAsync(id)
-            is ToDo toDo ?
-               TypedResults.Ok(toDo) : TypedResults.NotFound();
+    //static async Task<Results<Ok<ToDo>, NotFound>> GetToDoById(int id, ToDoDb db) =>
+    //      await db.ToDos.FindAsync(id)
+    //        is ToDo toDo ?
+    //           TypedResults.Ok(toDo) : TypedResults.NotFound();
+
+    static async Task<Results<Ok<ToDo>, NotFound>> GetTodoById(int id, ToDoDb db) =>
+    await db.ToDos.FindAsync(id)
+        is ToDo todo
+            ? TypedResults.Ok(todo)
+            : TypedResults.NotFound();
+
 
     static async Task<Results<Ok<List<ToDo>>, NotFound>>
        GetAllTodos(ToDoDb db) => await db.ToDos.ToListAsync()
@@ -34,7 +41,7 @@ public static class ToDoItemsExtensions
               await db.ToDos.Where(t => t.IsComplete).ToListAsync())
         .WithOpenApi();
 
-        app.MapGet("todoitems/{id}", GetToDoById);
+        app.MapGet("todoitems/{id}", GetTodoById);
 
         toDoGroup.MapPost("/", async (ToDo newToDo, ToDoDb db) => {
             db.ToDos.Add(newToDo);
