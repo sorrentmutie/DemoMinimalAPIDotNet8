@@ -6,6 +6,17 @@ namespace DemoMinimalAPIDotNet8;
 
 public static class ToDoItemsExtensions
 {
+    static async Task<Results<Ok<ToDo>, NotFound>> GetToDoById(int id, ToDoDb db) =>
+          await db.ToDos.FindAsync(id)
+            is ToDo toDo ?
+               TypedResults.Ok(toDo) : TypedResults.NotFound();
+
+    static async Task<Results<Ok<List<ToDo>>, NotFound>>
+       GetAllTodos(ToDoDb db) => await db.ToDos.ToListAsync()
+               is List<ToDo> todos
+                   ? TypedResults.Ok(todos)
+                   : TypedResults.NotFound();
+
 
     public static void RegisterEndpoints(this WebApplication app)
     {
@@ -73,14 +84,5 @@ public static class ToDoItemsExtensions
 
     }
 
-    static async Task<Results<Ok<ToDo>, NotFound>> GetToDoById(int id, ToDoDb db) =>
-           await db.ToDos.FindAsync(id)
-             is ToDo toDo ?
-                TypedResults.Ok(toDo) : TypedResults.NotFound();
-
-    static async Task<Results<Ok<List<ToDo>>, NotFound>>
-       GetAllTodos(ToDoDb db) => await db.ToDos.ToListAsync()
-               is List<ToDo> todos
-                   ? TypedResults.Ok(todos)
-                   : TypedResults.NotFound();
+   
 }
