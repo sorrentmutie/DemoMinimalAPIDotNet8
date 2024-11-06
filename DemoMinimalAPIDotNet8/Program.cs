@@ -1,5 +1,5 @@
 using DemoAPI.Data;
-using DemoMinimalAPIDotNet8.ExtensionsMethods;
+using DemoMinimalAPIDotNet8;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

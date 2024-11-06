@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
-namespace DemoMinimalAPIDotNet8.ExtensionsMethods;
+namespace DemoMinimalAPIDotNet8;
 
 public static class ToDoItemsExtensions
 {
@@ -13,14 +13,8 @@ public static class ToDoItemsExtensions
     
         var toDoGroup = app.MapGroup("/todoitems");
 
-        toDoGroup.MapGet("/",
-            async Task<Results<Ok<List<ToDo>>, NotFound>>
-            (ToDoDb db) => await db.ToDos.ToListAsync()
-                    is List<ToDo> todos
-                        ? TypedResults.Ok(todos)
-                        : TypedResults.NotFound()
-
-            );
+        app.MapGet("/todoitems",
+            GetAllTodos);
         //.Produces<List<ToDo>>(StatusCodes.Status200OK)
         //.Produces(StatusCodes.Status404NotFound)
 
@@ -29,11 +23,7 @@ public static class ToDoItemsExtensions
               await db.ToDos.Where(t => t.IsComplete).ToListAsync())
         .WithOpenApi();
 
-        toDoGroup.MapGet("/{id}", async (int id, ToDoDb db) =>
-           await db.ToDos.FindAsync(id)
-             is ToDo toDo ?
-                Results.Ok(toDo) : Results.NotFound()
-        );
+        app.MapGet("todoitems/{id}", GetToDoById);
 
         toDoGroup.MapPost("/", async (ToDo newToDo, ToDoDb db) => {
             db.ToDos.Add(newToDo);
@@ -82,6 +72,11 @@ public static class ToDoItemsExtensions
 
 
     }
+
+    static async Task<Results<Ok<ToDo>, NotFound>> GetToDoById(int id, ToDoDb db) =>
+           await db.ToDos.FindAsync(id)
+             is ToDo toDo ?
+                TypedResults.Ok(toDo) : TypedResults.NotFound();
 
     static async Task<Results<Ok<List<ToDo>>, NotFound>>
        GetAllTodos(ToDoDb db) => await db.ToDos.ToListAsync()
