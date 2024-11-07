@@ -10,7 +10,12 @@ public static class TodoItemsEndpoints
     {
         var todoItems = app.MapGroup("/todoitems");
 
-        todoItems.MapGet("/",  GetTodos);
+        todoItems.MapGet("/",  GetTodos)
+            .WithOpenApi(operation => new(operation)
+            {
+                Summary = "This is a summary",
+                Description = "This is a description"
+            });
         todoItems.MapGet("/complete", GetCompleteTodos);
         todoItems.MapGet("/{id}", GetTodoById);
         todoItems.MapPost("/", PostTodoItem).

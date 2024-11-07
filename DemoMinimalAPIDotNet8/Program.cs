@@ -13,7 +13,6 @@ builder.Services.AddKeyedSingleton<IMyCache, SmallCache>("small");
 builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList"));
 
 
-
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -31,6 +30,28 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseExceptionHandler(exceptionHandlerApp =>
+{
+    exceptionHandlerApp.Run(async httpContext =>
+    {
+        var pds = httpContext.RequestServices.GetService<IProblemDetailsService>();
+        if (pds == null
+            || !await pds.TryWriteAsync(new() { HttpContext = httpContext }))
+        {
+            // Fallback behavior
+            await httpContext.Response.WriteAsync("xxxFallback: An error occurred.");
+        }
+    });
+});
+
+app.MapGet("/exception", () =>
+{
+    throw new InvalidOperationException("Sample Exception");
+});
+
+app.MapGet("/users/{id:int}", (int id)
+    => id <= 0 ? Results.BadRequest() : Results.Ok(new { id }));
 
 app.RegisterTodoItemsEndpoints();
 
