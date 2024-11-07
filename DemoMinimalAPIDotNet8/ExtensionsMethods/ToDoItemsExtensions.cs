@@ -4,12 +4,33 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DemoMinimalAPIDotNet8;
 
-public static class ToDoItemsExtensions
+public static class TodoItemsEndpoints
 {
-    //static async Task<Results<Ok<ToDo>, NotFound>> GetToDoById(int id, ToDoDb db) =>
-    //      await db.ToDos.FindAsync(id)
-    //        is ToDo toDo ?
-    //           TypedResults.Ok(toDo) : TypedResults.NotFound();
+    public static void RegisterTodoItemsEndpoints(this WebApplication app)
+    {
+        var todoItems = app.MapGroup("/todoitems");
+
+        todoItems.MapGet("/", GetTodos);
+        todoItems.MapGet("/complete", GetCompleteTodos);
+        todoItems.MapGet("/{id}", GetTodoById);
+        todoItems.MapPost("/", PostTodoItem);
+         //   .WithValidation<ToDo>();
+        // .AddEndpointFilter<MyValidationFilter<ToDo>>();
+        todoItems.MapPut("/{id}", PutToDoItem);
+        todoItems.MapDelete("/{id}", DeleteToDoItem);
+    }
+
+    static async Task<Results<Ok<List<ToDo>>, NotFound>>
+        GetTodos(ToDoDb db) => await db.ToDos.ToListAsync()
+                is List<ToDo> todos
+                    ? TypedResults.Ok(todos)
+                    : TypedResults.NotFound();
+
+    static async Task<Results<Ok<List<ToDo>>, NotFound>>
+       GetCompleteTodos(ToDoDb db) => await db.ToDos.Where(x => x.IsComplete).ToListAsync()
+               is List<ToDo> todos
+                   ? TypedResults.Ok(todos)
+                   : TypedResults.NotFound();
 
     static async Task<Results<Ok<ToDo>, NotFound>> GetTodoById(int id, ToDoDb db) =>
     await db.ToDos.FindAsync(id)
@@ -17,79 +38,36 @@ public static class ToDoItemsExtensions
             ? TypedResults.Ok(todo)
             : TypedResults.NotFound();
 
-
-    static async Task<Results<Ok<List<ToDo>>, NotFound>>
-       GetAllTodos(ToDoDb db) => await db.ToDos.ToListAsync()
-               is List<ToDo> todos
-                   ? TypedResults.Ok(todos)
-                   : TypedResults.NotFound();
-
-
-    public static void RegisterEndpoints(this WebApplication app)
+    static async Task<Created<ToDo>> PostTodoItem(ToDo todo, ToDoDb db)
     {
-        
-    
-        var toDoGroup = app.MapGroup("/todoitems");
-
-        app.MapGet("/todoitems",
-            GetAllTodos);
-        //.Produces<List<ToDo>>(StatusCodes.Status200OK)
-        //.Produces(StatusCodes.Status404NotFound)
-
-
-        toDoGroup.MapGet("/completed", async (ToDoDb db) =>
-              await db.ToDos.Where(t => t.IsComplete).ToListAsync())
-        .WithOpenApi();
-
-        app.MapGet("todoitems/{id}", GetTodoById);
-
-        toDoGroup.MapPost("/", async (ToDo newToDo, ToDoDb db) => {
-            db.ToDos.Add(newToDo);
-            await db.SaveChangesAsync();
-            //return Results.NoContent();
-            return Results.Created($"/todoitems/{newToDo.Id}", newToDo);
-        });
-
-        toDoGroup.MapPut("/{id}", async
-            (int id, ToDo inputToDo, ToDoDb db) => {
-
-                // if(id != inputToDo.Id) return Results.BadRequest();
-
-                var todo = await db.ToDos.FindAsync(id);
-                if (todo is null) return Results.NotFound();
-                todo.Name = inputToDo.Name;
-                todo.IsComplete = inputToDo.IsComplete;
-                await db.SaveChangesAsync();
-                return Results.NoContent();
-            });
-
-        //toDoGroup.MapPatch("/{id}", async (int id, ToDo inputToDo, ToDoDb db) => {
-
-        //    var todo = await db.ToDos.FindAsync(id);
-        //    if (todo is null) return Results.NotFound();
-
-        //    if(inputToDo.Name != null)
-        //    {
-        //        todo.Name = inputToDo.Name;
-        //    }
-
-        //    todo.IsComplete = inputToDo.IsComplete;
-        //    await db.SaveChangesAsync();
-        //    return Results.NoContent();
-
-        //});
-
-        toDoGroup.MapDelete("/{id}", async (int id, ToDoDb db) =>
-        {
-            var todo = await db.ToDos.FindAsync(id);
-            if (todo is null) return Results.NotFound();
-            db.ToDos.Remove(todo);
-            await db.SaveChangesAsync();
-            return Results.NoContent();
-        });
-
-
+        db.ToDos.Add(todo);
+        await db.SaveChangesAsync();
+        return TypedResults.Created($"/todoitems/{todo.Id}", todo);
     }
 
-   
+    static async Task<Results<NotFound, NoContent>> PutToDoItem(int id, ToDo inputTodo, ToDoDb db)
+    {
+        var todo = await db.ToDos.FindAsync(id);
+
+        if (todo is null) return TypedResults.NotFound();
+
+        todo.Name = inputTodo.Name;
+        todo.IsComplete = inputTodo.IsComplete;
+
+        await db.SaveChangesAsync();
+
+        return TypedResults.NoContent();
+    }
+
+    static async Task<Results<NotFound, NoContent>> DeleteToDoItem(int id, ToDoDb db)
+    {
+        if (await db.ToDos.FindAsync(id) is ToDo todo)
+        {
+            db.ToDos.Remove(todo);
+            await db.SaveChangesAsync();
+            return TypedResults.NoContent();
+        }
+
+        return TypedResults.NotFound();
+    }
 }

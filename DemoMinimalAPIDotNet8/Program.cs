@@ -22,7 +22,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.RegisterEndpoints(); 
+app.RegisterTodoItemsEndpoints(); 
 
 app.Run();
 
