@@ -1,4 +1,5 @@
 ﻿using DemoAPI.Data;
+using DemoMinimalAPIDotNet8.ExtensionsMethods;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,8 +14,8 @@ public static class TodoItemsEndpoints
         todoItems.MapGet("/", GetTodos);
         todoItems.MapGet("/complete", GetCompleteTodos);
         todoItems.MapGet("/{id}", GetTodoById);
-        todoItems.MapPost("/", PostTodoItem);
-         //   .WithValidation<ToDo>();
+        todoItems.MapPost("/", PostTodoItem)
+           .WithValidation<ToDo>();
         // .AddEndpointFilter<MyValidationFilter<ToDo>>();
         todoItems.MapPut("/{id}", PutToDoItem);
         todoItems.MapDelete("/{id}", DeleteToDoItem);
