@@ -15,6 +15,7 @@ builder.Services.AddDbContext<ToDoDb>(
     options => options.UseInMemoryDatabase("ToDoList"));
 builder.Services.AddKeyedSingleton<IMyCache, BigCache>("big");
 builder.Services.AddKeyedSingleton<IMyCache, SmallCache>("small");
+builder.Services.AddScoped<IToDoData, ToDoDataService>();
 
 var app = builder.Build();
 

@@ -1,7 +1,10 @@
 ﻿using DemoAPI.Data;
+using DemoMinimal.Core.DTO;
+using DemoMinimal.Core.Interfaces;
 using DemoMinimalAPIDotNet8.ExtensionsMethods;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata.Ecma335;
 
 namespace DemoMinimalAPIDotNet8;
 
@@ -11,21 +14,28 @@ public static class TodoItemsEndpoints
     {
         var todoItems = app.MapGroup("/todoitems");
 
-        todoItems.MapGet("/", GetTodos);
+        //todoItems.MapGet("/", GetTodos);
+        todoItems.MapGet("/", GetTodos2);
         todoItems.MapGet("/complete", GetCompleteTodos);
         todoItems.MapGet("/{id}", GetTodoById);
         todoItems.MapPost("/", PostTodoItem)
-           .WithValidation<ToDo>();
-        // .AddEndpointFilter<MyValidationFilter<ToDo>>();
+           .WithValidation<ToDoDTO>();
         todoItems.MapPut("/{id}", PutToDoItem);
         todoItems.MapDelete("/{id}", DeleteToDoItem);
     }
 
-    static async Task<Results<Ok<List<ToDo>>, NotFound>>
+    public static async Task<Results<Ok<List<ToDo>>, NotFound>>
         GetTodos(ToDoDb db) => await db.ToDos.ToListAsync()
                 is List<ToDo> todos
                     ? TypedResults.Ok(todos)
                     : TypedResults.NotFound();
+
+    public static async Task<Ok<List<ToDoDTO>>>
+        GetTodos2(IToDoData data) => TypedResults.Ok(await data.GetAsync());
+
+
+
+
 
     static async Task<Results<Ok<List<ToDo>>, NotFound>>
        GetCompleteTodos(ToDoDb db) => await db.ToDos.Where(x => x.IsComplete).ToListAsync()
@@ -39,12 +49,23 @@ public static class TodoItemsEndpoints
             ? TypedResults.Ok(todo)
             : TypedResults.NotFound();
 
-    static async Task<Created<ToDo>> PostTodoItem(ToDo todo, ToDoDb db)
+    //static async Task<Created<ToDo>> PostTodoItem(ToDo todo, ToDoDb db)
+    //{
+    //    db.ToDos.Add(todo);
+    //    await db.SaveChangesAsync();
+    //    return TypedResults.Created($"/todoitems/{todo.Id}", todo);
+    //}
+
+    static async Task<Created<ToDoDTO>> PostTodoItem(ToDoDTO todo, IToDoData db)
     {
-        db.ToDos.Add(todo);
-        await db.SaveChangesAsync();
+        var id = await db.AddAsync(todo);
+        todo.Id = id;
+        //db.ToDos.Add(todo);
+        //await db.SaveChangesAsync();
         return TypedResults.Created($"/todoitems/{todo.Id}", todo);
     }
+
+
 
     static async Task<Results<NotFound, NoContent>> PutToDoItem(int id, ToDo inputTodo, ToDoDb db)
     {
