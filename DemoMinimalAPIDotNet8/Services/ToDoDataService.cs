@@ -23,6 +23,7 @@ public class ToDoDataService : IToDoData
 
         await database.ToDos.AddAsync(newTodo);
         await database.SaveChangesAsync();
+        database.Entry(newTodo).State = EntityState.Detached;
         return newTodo.Id;
     }
 
@@ -36,5 +37,20 @@ public class ToDoDataService : IToDoData
                 Completato = x.IsComplete
             })
             .ToListAsync();
+    }
+
+    public async Task<ToDoDTO?> GetAsyncById(int id)
+    {
+        var todo = await database.ToDos
+             .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (todo is null) return null;
+
+        return new ToDoDTO
+            {
+                Id = todo.Id,
+                Nome = todo.Name,
+                Completato = todo.IsComplete
+            };
     }
 }

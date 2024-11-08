@@ -5,7 +5,7 @@ namespace DemoMinimal.Core.Interfaces;
 public interface IToDoData
 {
     Task<List<ToDoDTO>?> GetAsync();
-    //Task<ToDoDTO?> GetAsync(int id);
+    Task<ToDoDTO?> GetAsyncById(int id);
     Task<int> AddAsync(ToDoDTO todo);
 }
 

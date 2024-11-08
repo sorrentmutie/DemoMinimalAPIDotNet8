@@ -43,11 +43,18 @@ public static class TodoItemsEndpoints
                    ? TypedResults.Ok(todos)
                    : TypedResults.NotFound();
 
-    static async Task<Results<Ok<ToDo>, NotFound>> GetTodoById(int id, ToDoDb db) =>
-    await db.ToDos.FindAsync(id)
-        is ToDo todo
-            ? TypedResults.Ok(todo)
-            : TypedResults.NotFound();
+    //static async Task<Results<Ok<ToDo>, NotFound>> GetTodoById(int id, ToDoDb db) =>
+    //await db.ToDos.FindAsync(id)
+    //    is ToDo todo
+    //        ? TypedResults.Ok(todo)
+    //        : TypedResults.NotFound();
+
+    public static async Task<Results<Ok<ToDoDTO>, NotFound>> GetTodoById(int id, IToDoData db) =>
+  await db.GetAsyncById(id)
+      is ToDoDTO todo
+          ? TypedResults.Ok(todo)
+          : TypedResults.NotFound();
+
 
     //static async Task<Created<ToDo>> PostTodoItem(ToDo todo, ToDoDb db)
     //{

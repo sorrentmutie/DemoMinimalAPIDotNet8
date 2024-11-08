@@ -10,6 +10,22 @@ namespace DemoMinimal.Tests
     public class ToDoEndpointsTests
     {
         [Fact]
+        public async Task GetToDoById()
+        {
+            var id = 5;
+            var mock = new Mock<IToDoData>();
+            mock.Setup(m => m.GetAsyncById(id)).ReturnsAsync(
+                new ToDoDTO
+                { Id = id, Completato = true, Nome = "Test" }
+            );
+
+            var result = await TodoItemsEndpoints.GetTodoById(id, mock.Object);
+            Assert.IsType<Results<Ok<ToDoDTO>, NotFound>>(result);
+            var todo = (Ok<ToDoDTO>)result.Result;
+            Assert.Equal(todo.Value?.Id, id);
+        }
+
+        [Fact]
         public async Task GetTodosTests()
         {
             var mock = new Mock<IToDoData>();
