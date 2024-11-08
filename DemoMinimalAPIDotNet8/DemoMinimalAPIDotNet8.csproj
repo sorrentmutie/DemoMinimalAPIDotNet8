@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DemoAPI.Data\DemoAPI.Data.csproj" />
+    <ProjectReference Include="..\DemoMinimal.Core\DemoMinimal.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoMinimalAPIDotNet8", "De
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoAPI.Data", "DemoAPI.Data\DemoAPI.Data.csproj", "{60EF57CD-0B98-435C-86B1-3DB765E8B979}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoMinimal.Core", "DemoMinimal.Core\DemoMinimal.Core.csproj", "{AE08D6FC-CA77-4817-A4AF-9F6FB5FDDFD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{60EF57CD-0B98-435C-86B1-3DB765E8B979}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60EF57CD-0B98-435C-86B1-3DB765E8B979}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60EF57CD-0B98-435C-86B1-3DB765E8B979}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE08D6FC-CA77-4817-A4AF-9F6FB5FDDFD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE08D6FC-CA77-4817-A4AF-9F6FB5FDDFD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE08D6FC-CA77-4817-A4AF-9F6FB5FDDFD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE08D6FC-CA77-4817-A4AF-9F6FB5FDDFD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
